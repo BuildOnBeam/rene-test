@@ -1,34 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vue.js App with Vue Router</title>
     <!-- Include Vue.js from CDN -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <!-- Include Vue Router from CDN -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/vue-router@3"></script> --> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue-router@3"></script> -->
+    -->
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TX4BNHGBC0"></script>
     <script>
-
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    var client_id = Math.floor(Math.random() * 1000000000) + '.' + Math.floor(Math.random() * 1000000000);
-    gtag('config', 'G-TX4BNHGBC0', {'client_id': client_id, 'cookie_expires': 1});
+      Object.defineProperty(document, "cookie", {
+        get: function () {
+          // need to add a fake _ga cookie to the real cookies collection.
+          var realCookies = Object.getOwnPropertyDescriptor(
+            Document.prototype,
+            "cookie"
+          ).get.call(document);
+          // make up a random ID here
+          var random_id =
+            Math.floor(Math.random() * 1000000000) +
+            "." +
+            Math.floor(Math.random() * 1000000000);
+          if (realCookies.trim().length > 0) {
+            realCookies += "; ";
+          }
+          realCookies += "_ga=GA1.1." + random_id;
+          return realCookies;
+        },
+        set: function (value) {
+          // just dump any attempts to set a ga cookie
+          if (value.trim().startsWith("_ga")) {
+            // do nothing
+          } else {
+            // accessing underlying cookie object to set the cookie
+            Object.getOwnPropertyDescriptor(
+              Document.prototype,
+              "cookie"
+            ).set.call(document, value);
+          }
+        },
+      });
     </script>
-</head>
-<body>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-TX4BNHGBC0"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      var client_id =
+        Math.floor(Math.random() * 1000000000) +
+        "." +
+        Math.floor(Math.random() * 1000000000);
+      gtag("config", "G-TX4BNHGBC0", {
+        client_id: client_id,
+        cookie_expires: 1,
+      });
+    </script>
+  </head>
+  <body>
     <div id="app">
-        <nav>
-            <ul>
-                <li><router-link to="/home">Home</router-link></li>
-                <li><router-link to="/blog">Blog</router-link></li>
-            </ul>
-        </nav>
-        <router-view></router-view>
+      <nav>
+        <ul>
+          <li><router-link to="/home">Home</router-link></li>
+          <li><router-link to="/blog">Blog</router-link></li>
+        </ul>
+      </nav>
+      <router-view></router-view>
     </div>
 
     <!-- <script>
@@ -58,5 +102,5 @@
             router
         });
     </script> -->
-</body>
+  </body>
 </html>
