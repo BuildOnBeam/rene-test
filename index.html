@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue.js App with Vue Router</title>
+    <!-- Include Vue.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- Include Vue Router from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue-router@3"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TX4BNHGBC0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-TX4BNHGBC0');
+    </script>
+</head>
+<body>
+    <div id="app">
+        <nav>
+            <ul>
+                <li><router-link to="/home">Home</router-link></li>
+                <li><router-link to="/blog">Blog</router-link></li>
+            </ul>
+        </nav>
+        <router-view></router-view>
+    </div>
+
+    <script>
+        // Define components for the routes
+        const Home = { template: '<div><h2>Home Page</h2></div>' };
+        const Blog = { template: '<div><h2>Blog Page</h2></div>' };
+
+        // Set up the routes
+        const routes = [
+            { path: '/home', component: Home },
+            { path: '/blog', component: Blog }
+        ];
+
+        // Create the router instance
+        const router = new VueRouter({
+            routes
+        });
+
+        // Log to the console on every history change
+        router.afterEach((to, from) => {
+            console.log(`Navigated from ${from.path} to ${to.path}`);
+        });
+
+        // Create and mount the root instance
+        const app = new Vue({
+            el: '#app',
+            router
+        });
+    </script>
+</body>
+</html>
