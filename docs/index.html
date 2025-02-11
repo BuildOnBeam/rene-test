@@ -9,8 +9,12 @@
     <!-- Include Vue Router from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/vue-router@3"></script>
     <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-TX4BNHGBC0"
+    ></script>
     <script>
-      Object.defineProperty(document, "cookie", {
+        Object.defineProperty(document, "cookie", {
         get: function () {
           // need to add a fake _ga cookie to the real cookies collection.
           var realCookies = Object.getOwnPropertyDescriptor(
@@ -41,12 +45,8 @@
           }
         },
       });
-    </script>
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-TX4BNHGBC0"
-    ></script>
-    <script>
+
+      // Google Analytics
       window.dataLayer = window.dataLayer || [];
       function gtag() {
         dataLayer.push(arguments);
