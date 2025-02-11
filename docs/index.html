@@ -58,7 +58,8 @@
       }
       gtag("js", new Date());
       gtag("config", "G-TX4BNHGBC0", {
-        client_id: ga_client_id
+        client_id: ga_client_id,
+        page_path: location.pathname + location.hash
       });
     </script>
     <script
@@ -96,6 +97,11 @@
       // Log to the console on every history change
       router.afterEach((to, from) => {
         console.log(`Navigated from ${from.path} to ${to.path}`);
+
+        gtag("event", "page_view", {
+          page_title: to.path,
+          page_location: to.path,
+        });
       });
 
       // Create and mount the root instance
