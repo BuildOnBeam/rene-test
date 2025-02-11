@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vue.js App with Vue Router</title>
+    <title>No cookie</title>
     <!-- Include Vue.js from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <!-- Include Vue Router from CDN -->
@@ -27,12 +27,11 @@
             "cookie"
           ).get.call(document);
 
-          realCookies = realCookies
-            .split(";")
-            .push(...google_cookies)
-            .join(";");
+          realCookies = (realCookies || "").split(";");
+          realCookies.push(...google_cookies);
+          realCookies = realCookies.join("; ");
 
-            if (realCookies.trim().length > 0) {
+        if (realCookies.trim().length > 0) {
             realCookies += "; ";
           }
           console.log("realCookies", realCookies);
