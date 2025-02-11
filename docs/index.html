@@ -38,7 +38,6 @@
           return docCookies;
         },
         set: function (value) {
-          console.log("value", value);
           // just dump any attempts to set a ga cookie
           if (value.trim().startsWith("_ga")) {
             google_cookies.push(value);
