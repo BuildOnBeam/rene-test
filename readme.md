@@ -2,6 +2,11 @@
 
 Welcome to Rene Weteling's Playground! This repository serves as a sandbox environment where Rene can experiment with new ideas, test code snippets, and explore various programming concepts.
 
+## Google Analytics no cookie test
+https://analytics.google.com/analytics/web/?authuser=1#/p477536759/realtime/overview?params=_u..nav%3Dmaui
+https://buildonbeam.github.io/rene-test/#/home
+
+
 ## Purpose
 
 The primary goal of this repository is to provide a flexible and open space for creative coding and learning. Feel free to explore the code, make changes, and learn alongside Rene.
