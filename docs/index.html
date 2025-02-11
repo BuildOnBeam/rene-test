@@ -9,10 +9,7 @@
     <!-- Include Vue Router from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/vue-router@3"></script>
     <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-TX4BNHGBC0"
-    ></script>
+
     <script>
       var ga_client_id =
         Math.floor(Math.random() * 1000000000) +
@@ -21,6 +18,7 @@
 
       // overwrite the cookie property to add a fake _ga cookie to the real cookies collection,
       // and prevent GA from storing a cookies
+      var google_cookies = [];
       Object.defineProperty(document, "cookie", {
         get: function () {
           // need to add a fake _ga cookie to the real cookies collection.
@@ -28,18 +26,23 @@
             Document.prototype,
             "cookie"
           ).get.call(document);
-          // make up a random ID here
 
-          if (realCookies.trim().length > 0) {
+          realCookies = realCookies
+            .split(";")
+            .push(...google_cookies)
+            .join(";");
+
+            if (realCookies.trim().length > 0) {
             realCookies += "; ";
           }
-          realCookies += "_ga=GA1.1." + ga_client_id;
+          console.log("realCookies", realCookies);
           return realCookies;
         },
         set: function (value) {
+            console.log("value", value);
           // just dump any attempts to set a ga cookie
           if (value.trim().startsWith("_ga")) {
-            // do nothing
+            google_cookies.push(value);
           } else {
             // accessing underlying cookie object to set the cookie
             Object.getOwnPropertyDescriptor(
@@ -63,6 +66,10 @@
         cookie_update: false, // do not update the cookie
       });
     </script>
+    <script
+     async
+     src="https://www.googletagmanager.com/gtag/js?id=G-TX4BNHGBC0"
+   ></script>
   </head>
   <body>
     <div id="app">
