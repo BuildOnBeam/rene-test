@@ -14,37 +14,39 @@
       src="https://www.googletagmanager.com/gtag/js?id=G-TX4BNHGBC0"
     ></script>
     <script>
-        Object.defineProperty(document, "cookie", {
-        get: function () {
-          // need to add a fake _ga cookie to the real cookies collection.
-          var realCookies = Object.getOwnPropertyDescriptor(
-            Document.prototype,
-            "cookie"
-          ).get.call(document);
-          // make up a random ID here
-          var random_id =
-            Math.floor(Math.random() * 1000000000) +
-            "." +
-            Math.floor(Math.random() * 1000000000);
-          if (realCookies.trim().length > 0) {
-            realCookies += "; ";
-          }
-          realCookies += "_ga=GA1.1." + random_id;
-          return realCookies;
-        },
-        set: function (value) {
-          // just dump any attempts to set a ga cookie
-          if (value.trim().startsWith("_ga")) {
-            // do nothing
-          } else {
-            // accessing underlying cookie object to set the cookie
-            Object.getOwnPropertyDescriptor(
-              Document.prototype,
-              "cookie"
-            ).set.call(document, value);
-          }
-        },
-      });
+      var ga_client_id =
+        Math.floor(Math.random() * 1000000000) +
+        "." +
+        Math.floor(Math.random() * 1000000000);
+
+    //   Object.defineProperty(document, "cookie", {
+    //     get: function () {
+    //       // need to add a fake _ga cookie to the real cookies collection.
+    //       var realCookies = Object.getOwnPropertyDescriptor(
+    //         Document.prototype,
+    //         "cookie"
+    //       ).get.call(document);
+    //       // make up a random ID here
+
+    //       if (realCookies.trim().length > 0) {
+    //         realCookies += "; ";
+    //       }
+    //       realCookies += "_ga=GA1.1." + ga_client_id;
+    //       return realCookies;
+    //     },
+    //     set: function (value) {
+    //       // just dump any attempts to set a ga cookie
+    //       if (value.trim().startsWith("_ga")) {
+    //         // do nothing
+    //       } else {
+    //         // accessing underlying cookie object to set the cookie
+    //         Object.getOwnPropertyDescriptor(
+    //           Document.prototype,
+    //           "cookie"
+    //         ).set.call(document, value);
+    //       }
+    //     },
+    //   });
 
       // Google Analytics
       window.dataLayer = window.dataLayer || [];
@@ -52,14 +54,9 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-
-      var client_id =
-        Math.floor(Math.random() * 1000000000) +
-        "." +
-        Math.floor(Math.random() * 1000000000);
       gtag("config", "G-TX4BNHGBC0", {
-        client_id: client_id,
-        cookie_expires: 1,
+        client_id: ga_client_id,
+        cookie_expires: 0,
       });
     </script>
   </head>
@@ -75,31 +72,31 @@
     </div>
 
     <script>
-        // Define components for the routes
-        const Home = { template: '<div><h2>Home Page</h2></div>' };
-        const Blog = { template: '<div><h2>Blog Page</h2></div>' };
+      // Define components for the routes
+      const Home = { template: "<div><h2>Home Page</h2></div>" };
+      const Blog = { template: "<div><h2>Blog Page</h2></div>" };
 
-        // Set up the routes
-        const routes = [
-            { path: '/home', component: Home },
-            { path: '/blog', component: Blog }
-        ];
+      // Set up the routes
+      const routes = [
+        { path: "/home", component: Home },
+        { path: "/blog", component: Blog },
+      ];
 
-        // Create the router instance
-        const router = new VueRouter({
-            routes
-        });
+      // Create the router instance
+      const router = new VueRouter({
+        routes,
+      });
 
-        // Log to the console on every history change
-        router.afterEach((to, from) => {
-            console.log(`Navigated from ${from.path} to ${to.path}`);
-        });
+      // Log to the console on every history change
+      router.afterEach((to, from) => {
+        console.log(`Navigated from ${from.path} to ${to.path}`);
+      });
 
-        // Create and mount the root instance
-        const app = new Vue({
-            el: '#app',
-            router
-        });
+      // Create and mount the root instance
+      const app = new Vue({
+        el: "#app",
+        router,
+      });
     </script>
   </body>
 </html>
