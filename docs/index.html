@@ -22,23 +22,23 @@
       Object.defineProperty(document, "cookie", {
         get: function () {
           // need to add a fake _ga cookie to the real cookies collection.
-          var realCookies = Object.getOwnPropertyDescriptor(
+          var docCookies = Object.getOwnPropertyDescriptor(
             Document.prototype,
             "cookie"
           ).get.call(document);
 
-          realCookies = (realCookies || "").split(";");
-          realCookies.push(...google_cookies);
-          realCookies = realCookies.join("; ");
+          docCookies = (docCookies || "").split(";");
+          docCookies.push(...google_cookies);
+          docCookies = docCookies.join("; ");
 
-        if (realCookies.trim().length > 0) {
-            realCookies += "; ";
+          if (docCookies.trim().length > 0) {
+            docCookies += "; ";
           }
-          console.log("realCookies", realCookies);
-          return realCookies;
+
+          return docCookies;
         },
         set: function (value) {
-            console.log("value", value);
+          console.log("value", value);
           // just dump any attempts to set a ga cookie
           if (value.trim().startsWith("_ga")) {
             google_cookies.push(value);
@@ -60,15 +60,15 @@
       gtag("js", new Date());
       gtag("config", "G-TX4BNHGBC0", {
         client_id: ga_client_id,
-        debug_mode: true,
-        cookie_expires: 0, // create session based cookies
-        cookie_update: false, // do not update the cookie
+        // debug_mode: false,
+        // cookie_expires: 0, // create session based cookies
+        // cookie_update: false, // do not update the cookie
       });
     </script>
     <script
-     async
-     src="https://www.googletagmanager.com/gtag/js?id=G-TX4BNHGBC0"
-   ></script>
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-TX4BNHGBC0"
+    ></script>
   </head>
   <body>
     <div id="app">
