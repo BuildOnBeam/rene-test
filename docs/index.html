@@ -58,11 +58,14 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
+      gtag('consent', 'default', {
+        'ad_storage': 'granted',
+        'ad_user_data': 'granted',
+        'ad_personalization': 'granted',
+        'analytics_storage': 'granted'
+        });
       gtag("config", "G-TX4BNHGBC0", {
-        client_id: ga_client_id,
-        // debug_mode: false,
-        // cookie_expires: 0, // create session based cookies
-        // cookie_update: false, // do not update the cookie
+        client_id: ga_client_id
       });
     </script>
     <script
