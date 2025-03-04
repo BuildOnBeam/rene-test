@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>No cookie</title>
+    <!-- Include Vue.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- Include Vue Router from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue-router@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/wagmi@2.14.12/dist/esm/exports/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/lib.commonjs/index.min.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div>
+        <button @click="connectWallet">Connect Wallet</button>
+        <div v-if="account">
+          <p>Connected Account: {{ account }}</p>
+          <p>Balance: {{ balance }} ETH</p>
+          <button @click="mintNFT">Mint NFT</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Importing from CDN
+      const { ref } = Vue;
+      const { useAccount, useConnect, useBalance } = wagmi;
+      const { ethers } = ethers;
+
+      export default {
+        setup() {
+          const { connect, connectors } = useConnect();
+          const { data: account } = useAccount();
+          const { data: balance } = useBalance({ addressOrName: account?.address });
+
+          const connectWallet = async () => {
+            try {
+              await connect(connectors[0]); // Connect using the first available connector
+            } catch (error) {
+              console.error('Failed to connect wallet:', error);
+            }
+          };
+
+          const mintNFT = async () => {
+            if (!account) return;
+
+            // Example minting logic
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const contractAddress = 'YOUR_NFT_CONTRACT_ADDRESS';
+            const contractABI = []; // Your NFT contract ABI
+            const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+            try {
+              const tx = await contract.mint(account.address);
+              await tx.wait();
+              console.log('NFT minted successfully');
+            } catch (error) {
+              console.error('Failed to mint NFT:', error);
+            }
+          };
+
+          return {
+            connectWallet,
+            account,
+            balance,
+            mintNFT,
+          };
+        },
+      };
+      </script>
+      </body>
+      </html>
+
+
