@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple React App</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .input-group {
+            margin: 20px 0;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        .input-group input.error {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- Web3 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@4.16.0/dist/web3.min.js"></script>
+    <!-- React CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+        // Global contract configuration
+        const contractAddress = "0xbb3B07B424100655ad21040eC2F0da2F77189024";
+        const rpcUrl = "https://build.onbeam.com/rpc/testnet";
+
+        // Load contract ABI from Oracle.json
+        let contractAbi = null;
+
+        // Function to load the ABI
+        const loadContractAbi = async () => {
+            const response = await fetch('./Oracle.json');
+            const contractData = await response.json();
+            contractAbi = contractData.abi;
+            console.log("Contract ABI loaded successfully");
+        };
+
+        // Browser-compatible updateValue function
+        const updateValue = async (value, privateKey) => {
+            try {
+                if (!contractAbi) {
+                    throw new Error('Contract ABI not loaded yet');
+                }
+
+                let web3, account;
+
+                if (privateKey && privateKey.trim()) {
+                    // Use private key authentication
+                    console.log("Using private key authentication");
+                    web3 = new Web3(rpcUrl);
+                    account = web3.eth.accounts.privateKeyToAccount(privateKey);
+                    web3.eth.accounts.wallet.add(account);
+                } else {
+                    // Use MetaMask authentication
+                    console.log("Using MetaMask authentication");
+                    if (typeof window.ethereum === 'undefined') {
+                        throw new Error('MetaMask is not installed. Please install MetaMask or provide a private key.');
+                    }
+
+                    // Request account access
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    account = accounts[0];
+
+                    // Create Web3 instance with MetaMask provider
+                    web3 = new Web3(window.ethereum);
+                }
+
+                const contractInstance = new web3.eth.Contract(contractAbi, contractAddress);
+
+                // Update the value
+                const tx = await contractInstance.methods.updateValue(value).send({
+                    from: account.address || account,
+                    gas: "212040",
+                });
+
+                console.log("Transaction hash:", tx.transactionHash);
+                console.log("Block number:", tx.blockNumber);
+
+                return {
+                    success: true,
+                    transactionHash: tx.transactionHash,
+                    authMethod: privateKey ? 'Private Key' : 'MetaMask'
+                };
+            } catch (error) {
+                console.error("Error:", error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        };
+
+        // Browser-compatible getValue function
+        const getValue = async () => {
+            try {
+                if (!contractAbi) {
+                    throw new Error('Contract ABI not loaded yet');
+                }
+
+                console.log("Fetching value using RPC only");
+
+                // Create Web3 instance with RPC URL only (no wallet needed for view functions)
+                const web3 = new Web3(rpcUrl);
+                const contractInstance = new web3.eth.Contract(contractAbi, contractAddress);
+
+                // Get the current value (view function, no transaction needed)
+                const currentValue = await contractInstance.methods.getValue().call();
+                console.log("Current value:", currentValue);
+
+                return {
+                    success: true,
+                    currentValue: currentValue
+                };
+            } catch (error) {
+                console.error("Error:", error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        };
+
+        function App() {
+            const [status, setStatus] = React.useState(null);
+            const [loading, setLoading] = React.useState(false);
+            const [currentValue, setCurrentValue] = React.useState(null);
+            const [updateValueInput, setUpdateValueInput] = React.useState('0');
+            const [autoUpdateEnabled, setAutoUpdateEnabled] = React.useState(false);
+            const [countdown, setCountdown] = React.useState(30);
+            const [updateHistory, setUpdateHistory] = React.useState([]);
+            const [privateKey, setPrivateKey] = React.useState(() => {
+                // Load private key from localStorage on component mount
+                return localStorage.getItem('oraclePrivateKey') || '';
+            });
+
+            // Save private key to localStorage whenever it changes
+            React.useEffect(() => {
+                if (privateKey) {
+                    localStorage.setItem('oraclePrivateKey', privateKey);
+                } else {
+                    localStorage.removeItem('oraclePrivateKey');
+                }
+            }, [privateKey]);
+
+
+            const handleGetValue = async () => {
+                setLoading(true);
+                setStatus({ type: 'info', message: 'Fetching current value...' });
+
+                const result = await getValue()
+
+                if (result.success) {
+                    setCurrentValue(result.currentValue);
+                    setStatus({
+                        type: 'success',
+                        message: `Current value: ${parseFloat(result.currentValue) / 1000000000000}`
+                    });
+                } else {
+                    setStatus({
+                        type: 'error',
+                        message: `Error: ${result.error}`
+                    });
+                }
+
+                setLoading(false);
+            };
+
+            const handleUpdateValue = async () => {
+                // Validate that update value is provided
+                if (!updateValueInput.trim()) {
+                    setStatus({
+                        type: 'error',
+                        message: 'Please enter a value to update'
+                    });
+                    return;
+                }
+
+                // Validate that it's a valid number
+                const numValue = parseInt(parseFloat(updateValueInput.replace(/,/g, '.')) * 1000000000000 );
+                console.log(numValue);
+                if (isNaN(numValue)) {
+                    setStatus({
+                        type: 'error',
+                        message: 'Please enter a valid number'
+                    });
+                    return;
+                }
+
+                setLoading(true);
+                setStatus({ type: 'info', message: 'Connecting to wallet and updating value...' });
+
+                const result = await updateValue(numValue, privateKey);
+
+                if (result.success) {
+                    setStatus({
+                        type: 'success',
+                        message: `Value updated successfully! Transaction: ${result.transactionHash.substring(0, 10)}... (Authenticated via ${result.authMethod})`
+                    });
+                } else {
+                    setStatus({
+                        type: 'error',
+                        message: `Error: ${result.error}`
+                    });
+                }
+
+                setLoading(false);
+            };
+
+            // Load ABI when component mounts
+            React.useEffect(() => {
+                loadContractAbi();
+            }, []);
+
+            // Auto-update countdown timer
+            React.useEffect(() => {
+                let interval;
+                if (autoUpdateEnabled && countdown > 0) {
+                    interval = setInterval(() => {
+                        setCountdown(prev => prev - 1);
+                    }, 1000);
+                } else if (autoUpdateEnabled && countdown === 0) {
+                    // Execute update when countdown reaches 0
+                    handleUpdatePriceFromCMC();
+                    setCountdown(30); // Reset countdown
+                }
+                return () => clearInterval(interval);
+            }, [autoUpdateEnabled, countdown]);
+
+            // Auto-update execution effect
+            React.useEffect(() => {
+                if (autoUpdateEnabled) {
+                    // Start the first update immediately
+                    handleUpdatePriceFromCMC();
+                    setCountdown(30);
+                }
+            }, [autoUpdateEnabled]);
+
+            const handleAutoUpdateToggle = () => {
+                if (autoUpdateEnabled) {
+                    // Stop auto-update
+                    setAutoUpdateEnabled(false);
+                    setCountdown(30);
+                    setStatus({
+                        type: 'info',
+                        message: 'Auto-update stopped'
+                    });
+                } else {
+                    // Start auto-update
+                    setAutoUpdateEnabled(true);
+                    setStatus({
+                        type: 'info',
+                        message: 'Auto-update started - will update every 30 seconds'
+                    });
+                }
+            };
+
+            const handleUpdatePriceFromCMC = async () => {
+                setLoading(true);
+                setStatus({ type: 'info', message: 'Fetching cryptocurrency data from CoinMarketCap...' });
+
+                try {
+                    const requestOptions = {
+                        method: "GET",
+                        redirect: "follow"
+                    };
+                    // https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyListingsLatest
+                    const path = "v1/cryptocurrency/listings/latest";
+                    const query = "start=1&limit=100&convert=USD&cryptocurrency_type=coins&sort=symbol";
+                    const apiUrl = `https://weteling.com/api/v1/cmc?path=${path}&query=${encodeURIComponent(query)}`;
+
+                    const response = await fetch(apiUrl, requestOptions);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const beam = result.data.find(crypto => crypto.symbol === 'BEAM');
+                    const price = beam.quote.USD.price;
+
+                    setUpdateValueInput(price.toString());
+
+                    // Show success message with data count
+                    setStatus({
+                        type: 'success',
+                        message: `Successfully fetched ${price} from CoinMarketCap`
+                    });
+
+                    await handleUpdateValue();
+
+                    await handleGetValue()
+
+                } catch (error) {
+                    console.error('Error fetching from CoinMarketCap:', error);
+                    setStatus({
+                        type: 'error',
+                        message: `Error fetching data: ${error.message}. CORS issue resolved with proxy.`
+                    });
+                }
+
+                setLoading(false);
+            };
+
+            return (
+                <div className="container">
+                    <h1>Simple Oracle</h1>
+                    <h2>Contract Address: {contractAddress}</h2>
+                    <a href="https://xtools-at.github.io/smartcontract-ui/" target="_blank">Smart Contract UI</a><br />
+                    <a href="https://subnets-test.avax.network/beam/address/0xbb3B07B424100655ad21040eC2F0da2F77189024" target="_blank">Beam Explorer</a>
+
+                    <div className="input-group">
+                        <label htmlFor="privateKey">Private Key (Optional - leave empty to use MetaMask):</label>
+                        <input
+                            type="password"
+                            id="privateKey"
+                            value={privateKey}
+                            onChange={(e) => setPrivateKey(e.target.value)}
+                            placeholder="Enter your private key (0x...) or leave empty to use MetaMask"
+                            disabled={loading}
+                        />
+                    </div>
+
+                    <div className="input-group">
+                        <label htmlFor="updateValue">Value to Update:</label>
+                        <input
+                            type="number"
+                            id="updateValue"
+                            value={updateValueInput}
+                            onChange={(e) => setUpdateValueInput(e.target.value)}
+                            placeholder="Enter a number to update the Oracle value"
+                            disabled={loading}
+                            className={!updateValueInput.trim() && loading ? 'error' : ''}
+                        />
+                    </div>
+
+                    {currentValue !== null && (
+                        <div className="status info">
+                            Current Oracle Value: <strong>{currentValue}</strong>
+                        </div>
+                    )}
+                    <a href="./Oracle.json" download>
+                        <button>Download ABI</button>
+                    </a> <br />
+                    <button onClick={handleGetValue} disabled={loading}>
+                        {loading ? 'Loading...' : 'Get Current Value'}
+                    </button>
+                    <br />
+                    <button onClick={handleUpdateValue} disabled={loading}>
+                        {loading ? 'Updating...' : 'Update Value'}
+                    </button>
+                    <br />
+                    <button onClick={handleUpdatePriceFromCMC} disabled={loading}>
+                        {loading ? 'Fetching...' : 'Update price from CMC'}
+                    </button>
+                    <br />
+                    <button
+                        onClick={handleAutoUpdateToggle}
+                        disabled={loading}
+                        style={{
+                            backgroundColor: autoUpdateEnabled ? '#dc3545' : '#28a745',
+                            color: 'white'
+                        }}
+                    >
+                        {autoUpdateEnabled ? `Stop Auto-Update (${countdown}s)` : 'Start Auto-Update (30s)'}
+                    </button>
+
+                    {autoUpdateEnabled && (
+                        <div className="status info">
+                            <strong>Auto-Update Active:</strong> Next update in {countdown} seconds
+                        </div>
+                    )}
+
+                    {updateHistory.length > 0 && (
+                        <div className="input-group">
+                            <label>Update History (Last 10):</label>
+                            <div style={{
+                                maxHeight: '200px',
+                                overflowY: 'auto',
+                                border: '1px solid #ddd',
+                                borderRadius: '4px',
+                                padding: '10px',
+                                backgroundColor: '#f8f9fa'
+                            }}>
+                                {updateHistory.map((entry, index) => (
+                                    <div key={index} style={{
+                                        borderBottom: index < updateHistory.length - 1 ? '1px solid #dee2e6' : 'none',
+                                        padding: '5px 0'
+                                    }}>
+                                        <strong>Update {updateHistory.length - index}:</strong><br/>
+                                        Time: {entry.timestamp}<br/>
+                                        Block: {entry.blockNumber}<br/>
+                                        BTC Price: ${entry.value}<br/>
+                                        Cryptos: {entry.cryptoCount}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {status && (
+                        <div className={`status ${status.type}`}>
+                            {status.message}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

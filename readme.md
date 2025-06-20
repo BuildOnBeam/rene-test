@@ -17,6 +17,23 @@ The primary goal of this repository is to provide a flexible and open space for 
 - Experiment with the code and make your own modifications.
 - Share your insights and improvements.
 
+## Solidity
+
+Try running some of the following tasks:
+
+```shell
+npx hardhat help
+npx hardhat test
+REPORT_GAS=true npx hardhat test
+npx hardhat compile
+npx hardhat ignition deploy ./ignition/modules/Oracle.ts --network beamTestnet
+
+
+# update the gas value
+npx ts-node scripts/updateValue.ts 51
+```
+
+
 ## Contributions
 
 While this is a personal playground, contributions are welcome. If you have suggestions or improvements, feel free to open an issue or submit a pull request.
